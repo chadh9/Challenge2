@@ -111,16 +111,15 @@ class SensorDataStorageTest {
     void read_fail_deletedfile() throws IOException {
         storage.setFile("deletedtext.txt");
         storage.saveData(1,new float[]{(1)});
-        storage.close();
         File file = new File("deletedtext.txt");
+        storage.close();
 
-        file.delete();
 
         try {
             List list = storage.read(0);
             Assertions.fail();
-        } catch (FileNotFoundException e) {
-            //test success
+        } catch (IOException e) {
+            file.delete();
         }
     }
 
