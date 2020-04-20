@@ -22,6 +22,7 @@ public class SensorDataStorageImpl implements SensorDataStorage {
     @Override
     public void setFile(String fileName) throws FileNotFoundException {
         outputStream = new FileOutputStream(fileName);
+        inputStream = new FileInputStream(fileName);
     }
 
     @Override

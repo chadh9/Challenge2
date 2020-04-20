@@ -37,7 +37,7 @@ class SensorDataStorageTest {
         storage.saveData(1,new float[]{1});
         List list = storage.read(0);
         Assertions.assertTrue(file.exists());
-        Assertions.assertEquals(1,list.get(0));
+        Assertions.assertEquals((long) 1,list.get(0));
     }
 
     @Test
