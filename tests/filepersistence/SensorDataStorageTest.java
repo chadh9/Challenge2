@@ -34,14 +34,30 @@ class SensorDataStorageTest {
     void setFile_success2() throws IOException {
         storage.setFile("test.txt");
         File file = new File("test.txt");
-        storage.saveData(1,new float[]{1});
+        storage.saveData(1, new float[]{1});
         List list = storage.read(0);
         Assertions.assertTrue(file.exists());
-        Assertions.assertEquals((long) 1,list.get(0));
+        Assertions.assertEquals((long) 1, list.get(0));
     }
 
     @Test
-    void saveData_success1() {
+    void setFile_fail_readonlyfile() throws IOException {
+        storage.setFile("readonlyfile.txt");
+        File file = new File("readonlyfile.txt");
+        file.setReadOnly();
+
+        try {
+            storage.setFile("readonlyfile.txt");
+            Assertions.fail();
+        } catch (FileNotFoundException e) {
+            //test success
+        }
+        file.delete();
+    }
+
+
+    @Test
+    void saveData_success1() throws IOException {
         storage.saveData(1, new float[]{(float) 1.0, (float) 2.0});
         Assertions.assertNotEquals(0, new File("initTest.txt").length());
     }
@@ -49,7 +65,7 @@ class SensorDataStorageTest {
     @Test
     void saveData_success2() throws IOException {
         storage.saveData(1, new float[]{(float) 1.0, (float) 2.0});
-        List list=storage.read(0);
+        List list = storage.read(0);
 
         Assertions.assertNotEquals(0, new File("initTest.txt").length());
         Assertions.assertEquals(list.get(0), (long) 1);
@@ -81,8 +97,6 @@ class SensorDataStorageTest {
     }
 
 
-
-
     @Test
     void read_success() throws IOException {
         storage.saveData(1, new float[]{(float) 1.1});
@@ -93,6 +107,22 @@ class SensorDataStorageTest {
         Assertions.assertArrayEquals((float[]) list.get(1), new float[]{(float) 1.1});
     }
 
+    @Test
+    void read_fail_deletedfile() throws IOException {
+        storage.setFile("deletedtext.txt");
+        storage.saveData(1,new float[]{(1)});
+        storage.close();
+        File file = new File("deletedtext.txt");
+
+        file.delete();
+
+        try {
+            List list = storage.read(0);
+            Assertions.fail();
+        } catch (FileNotFoundException e) {
+            //test success
+        }
+    }
 
     @Test
     void size_success() throws IOException {
@@ -113,8 +143,6 @@ class SensorDataStorageTest {
     }
 
 
-
-
     @Test
     void isEmpty_returnsTrueSuccess() throws IOException {
         Assertions.assertTrue(storage.isEmpty());
@@ -124,5 +152,16 @@ class SensorDataStorageTest {
     void isEmpty_returnsFalseSuccess() throws IOException {
         storage.saveData(1, new float[]{(float) 1.0});
         Assertions.assertFalse(storage.isEmpty());
+    }
+
+    @Test
+    void saveData_fail__close_success() throws IOException {
+        storage.close();
+        try {
+            storage.saveData(1,new float[]{});
+            Assertions.fail();
+        }
+        catch (IOException e){
+        }
     }
 }

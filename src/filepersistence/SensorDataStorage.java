@@ -8,7 +8,7 @@ public interface SensorDataStorage {
 
     void setFile(String fileName) throws FileNotFoundException;
 
-    void saveData(long time, float[] values);
+    void saveData(long time, float[] values) throws IOException;
 
     List read(int index) throws IOException;
 
@@ -16,5 +16,5 @@ public interface SensorDataStorage {
 
     boolean isEmpty() throws IOException;
 
-
+    void close() throws IOException;
 }

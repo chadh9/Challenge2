@@ -26,20 +26,18 @@ public class SensorDataStorageImpl implements SensorDataStorage {
     }
 
     @Override
-    public void saveData(long time, float[] values) {
+    public void saveData(long time, float[] values) throws IOException {
 
 
         dataOutputStream = new DataOutputStream(outputStream);
 
-        try {
-            dataOutputStream.writeLong(time);
-            dataOutputStream.writeInt(values.length);
-            for (float value : values) {
-                dataOutputStream.writeFloat(value);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+
+        dataOutputStream.writeLong(time);
+        dataOutputStream.writeInt(values.length);
+        for (float value : values) {
+            dataOutputStream.writeFloat(value);
         }
+
 
     }
 
@@ -86,5 +84,11 @@ public class SensorDataStorageImpl implements SensorDataStorage {
         if (dataInputStream.available() > 0) {
             return false;
         } else return true;
+    }
+
+    @Override
+    public void close() throws IOException {
+        outputStream.close();
+        inputStream.close();
     }
 }
