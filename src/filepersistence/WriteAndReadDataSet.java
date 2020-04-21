@@ -35,33 +35,5 @@ public class WriteAndReadDataSet {
         valueSet[0] = (float) 0.7;
         valueSet[1] = (float) 1.2;
 
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-        String filename = "valuesets.txt";
-
-
-        registerData registerData = new registerData(filename);
-
-
-        registerData.registerSensor(sensorName);
-        registerData.registerValues(values[0]);
-        registerData.registerValues(values[1]);
-        registerData.registerValues(values[2]);
-
-        registerData.registerValues(new float[]{(float)1.2, (float) 1.1,(float) 1.1,(float) 1.1,(float) 1.1,(float) 1.1,(float) 1.1});
-
-        registerData.close();
-
-
-        readDataFromFile readDataFromFile = new readDataFromFile();
-        readDataFromFile.read(filename);
-
-
-
-
     }
 }
