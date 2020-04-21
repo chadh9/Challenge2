@@ -20,10 +20,6 @@ public class SensorDataStorageImpl implements SensorDataStorage {
         this.fileName = fileName;
     }
 
-    @Override
-    public void setFile(String fileName){
-        this.fileName = fileName;
-    }
 
     @Override
     public void saveData(long time, float[] values) throws IOException {
@@ -101,6 +97,11 @@ public class SensorDataStorageImpl implements SensorDataStorage {
         if (dataInputStream.available() > 0) {
             return false;
         } else return true;
+    }
+
+    @Override
+    public void clear() throws FileNotFoundException {
+        outputStream = new FileOutputStream(fileName);
     }
 
     @Override
