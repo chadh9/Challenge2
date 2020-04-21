@@ -63,6 +63,42 @@ class SensorDataStorageTest {
         Assertions.assertArrayEquals((float[]) list.get(1), new float[]{(float) 1.0, (float) 2.0});
     }
 
+    @Test
+    void saveData_fail_stream_closed() throws IOException {
+
+        storage=new SensorDataStorageImpl("readonly.txt");
+        storage.close();
+        File file = new File("readonly.txt");
+
+
+        try {
+            storage.saveData(1, new float[]{(0)});
+            Assertions.fail();
+        }
+        catch (IOException ex){}
+        finally {
+            file.delete();
+        }
+    }
+
+    @Test
+    void constructor_FileNotFound_Exception_when_readonly() throws IOException {
+
+        storage=new SensorDataStorageImpl("readonly.txt");
+        storage.close();
+
+        File file = new File("readonly.txt");
+        file.setReadOnly();
+
+        try {
+            storage=new SensorDataStorageImpl("readonly.txt");
+            Assertions.fail();
+        }
+        catch (FileNotFoundException ex){}
+        finally {
+            file.delete();
+        }
+    }
 
     @Test
     void read_success() throws IOException {
