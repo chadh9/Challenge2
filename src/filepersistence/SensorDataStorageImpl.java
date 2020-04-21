@@ -13,24 +13,22 @@ public class SensorDataStorageImpl implements SensorDataStorage {
     private InputStream inputStream;
     private DataInputStream dataInputStream;
 
+    private String fileName;
 
-    public SensorDataStorageImpl(String s) throws FileNotFoundException {
-        outputStream = new FileOutputStream(s);
-        inputStream = new FileInputStream(s);
+    public SensorDataStorageImpl(String fileName) throws FileNotFoundException {
+        outputStream = new FileOutputStream(fileName);
+        this.fileName = fileName;
     }
 
     @Override
-    public void setFile(String fileName) throws FileNotFoundException {
-        outputStream = new FileOutputStream(fileName);
-        inputStream = new FileInputStream(fileName);
+    public void setFile(String fileName){
+        this.fileName = fileName;
     }
 
     @Override
     public void saveData(long time, float[] values) throws IOException {
 
-
         dataOutputStream = new DataOutputStream(outputStream);
-
 
         dataOutputStream.writeLong(time);
         dataOutputStream.writeInt(values.length);
@@ -45,27 +43,44 @@ public class SensorDataStorageImpl implements SensorDataStorage {
     @Override
     public List read(int index) throws IOException {
 
-        long time = 0;
+        long time;
         float[] values;
 
+        inputStream = new FileInputStream(fileName);
         dataInputStream = new DataInputStream(inputStream);
 
+        int counter = 0;
 
-        time = dataInputStream.readLong();
-        int count = dataInputStream.readInt();
-        values = new float[count];
-        for (int j = 0; j < count; j++) {
-            values[j] = dataInputStream.readFloat();
+
+        while (dataInputStream.available() > 0) {
+
+            time = dataInputStream.readLong();
+            int count = dataInputStream.readInt();
+            values = new float[count];
+
+            for (int j = 0; j < count; j++) {
+                values[j] = dataInputStream.readFloat();
+            }
+
+
+            if (index == counter) {
+                inputStream.close();
+                return Arrays.asList(time, values);
+            }
+
+            counter++;
+
         }
-
-        return Arrays.asList(time, values);
-
+        inputStream.close();
+        throw new NoSuchElementException();
 
     }
 
     @Override
     public int size() throws IOException {
         int i = 0;
+
+        inputStream=new FileInputStream(fileName);
         dataInputStream = new DataInputStream(inputStream);
         while (dataInputStream.available() > 0) {
             dataInputStream.readLong();
@@ -75,11 +90,13 @@ public class SensorDataStorageImpl implements SensorDataStorage {
             }
             i++;
         }
+        inputStream.close();
         return i;
     }
 
     @Override
     public boolean isEmpty() throws IOException {
+        inputStream= new FileInputStream(fileName);
         dataInputStream = new DataInputStream(inputStream);
         if (dataInputStream.available() > 0) {
             return false;
@@ -89,6 +106,5 @@ public class SensorDataStorageImpl implements SensorDataStorage {
     @Override
     public void close() throws IOException {
         outputStream.close();
-        inputStream.close();
     }
 }

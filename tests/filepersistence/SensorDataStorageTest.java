@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 class SensorDataStorageTest {
 
@@ -40,20 +41,7 @@ class SensorDataStorageTest {
         Assertions.assertEquals((long) 1, list.get(0));
     }
 
-    @Test
-    void setFile_fail_readonlyfile() throws IOException {
-        storage.setFile("readonlyfile.txt");
-        File file = new File("readonlyfile.txt");
-        file.setReadOnly();
 
-        try {
-            storage.setFile("readonlyfile.txt");
-            Assertions.fail();
-        } catch (FileNotFoundException e) {
-            //test success
-        }
-        file.delete();
-    }
 
 
     @Test
@@ -100,11 +88,17 @@ class SensorDataStorageTest {
     @Test
     void read_success() throws IOException {
         storage.saveData(1, new float[]{(float) 1.1});
-        storage.saveData(1, new float[]{(float) 1.1});
+        storage.saveData(2, new float[]{(float) 2.2});
 
-        List list = storage.read(1);
-        Assertions.assertEquals(list.get(0), (long) 1);
-        Assertions.assertArrayEquals((float[]) list.get(1), new float[]{(float) 1.1});
+        List set1 = storage.read(0);
+        Assertions.assertEquals(set1.get(0), (long) 1);
+        Assertions.assertArrayEquals((float[]) set1.get(1), new float[]{(float) 1.1});
+
+
+        List set2 = storage.read(1);
+        Assertions.assertEquals(set2.get(0), (long) 2);
+        Assertions.assertArrayEquals((float[]) set2.get(1), new float[]{(float) 2.2});
+
     }
 
     @Test
@@ -112,15 +106,30 @@ class SensorDataStorageTest {
         storage.setFile("deletedtext.txt");
         storage.saveData(1,new float[]{(1)});
         File file = new File("deletedtext.txt");
-        storage.close();
 
+        file.delete();
+        try {
+
+            storage.read(0);
+            Assertions.fail();
+
+        } catch (IOException e) {
+
+        }
+    }
+
+
+    @Test
+    void read_failNotExistingElement() throws IOException {
 
         try {
-            List list = storage.read(0);
+            List list = storage.read(1);
             Assertions.fail();
-        } catch (IOException e) {
-            file.delete();
         }
+        catch (NoSuchElementException e){
+
+        }
+
     }
 
     @Test
@@ -154,13 +163,16 @@ class SensorDataStorageTest {
     }
 
     @Test
-    void saveData_fail__close_success() throws IOException {
+    void close() throws IOException {
         storage.close();
         try {
-            storage.saveData(1,new float[]{});
+            storage.saveData(1,new float[]{1});
             Assertions.fail();
+        } catch (IOException e) {
+
         }
-        catch (IOException e){
-        }
+
     }
+
+
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface SensorDataStorage {
 
-    void setFile(String fileName) throws FileNotFoundException;
+    void setFile(String fileName);
 
     void saveData(long time, float[] values) throws IOException;
 
