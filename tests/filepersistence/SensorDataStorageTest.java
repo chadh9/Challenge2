@@ -29,6 +29,7 @@ class SensorDataStorageTest {
         File file = new File("test.txt");
 
         Assertions.assertTrue(file.exists());
+        file.delete();
     }
 
     @Test
@@ -106,30 +107,23 @@ class SensorDataStorageTest {
         storage.setFile("deletedtext.txt");
         storage.saveData(1,new float[]{(1)});
         File file = new File("deletedtext.txt");
-
         file.delete();
         try {
-
             storage.read(0);
             Assertions.fail();
-
         } catch (IOException e) {
-
         }
     }
 
 
     @Test
     void read_failNotExistingElement() throws IOException {
-
         try {
             List list = storage.read(1);
             Assertions.fail();
         }
         catch (NoSuchElementException e){
-
         }
-
     }
 
     @Test
@@ -139,14 +133,14 @@ class SensorDataStorageTest {
     }
 
     @Test
-    void size_success2() throws IOException {
+    void size_success_multiple_elements() throws IOException {
         storage.saveData(1, new float[]{(float) 1.1});
         storage.saveData(1, new float[]{(float) 1.1});
         Assertions.assertEquals(2, storage.size());
     }
 
     @Test
-    void size_success3() throws IOException {
+    void size_success_no_elements() throws IOException {
         Assertions.assertEquals(0, storage.size());
     }
 
@@ -163,7 +157,7 @@ class SensorDataStorageTest {
     }
 
     @Test
-    void close() throws IOException {
+    void close_success() throws IOException {
         storage.close();
         try {
             storage.saveData(1,new float[]{1});
@@ -171,8 +165,5 @@ class SensorDataStorageTest {
         } catch (IOException e) {
 
         }
-
     }
-
-
 }
