@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 
 public class SensorDataStorageImpl implements SensorDataStorage {
 
-    private OutputStream outputStream;
+    private OutputStream outputStream=null;
     private DataOutputStream dataOutputStream;
     private InputStream inputStream;
     private DataInputStream dataInputStream;
@@ -16,14 +16,14 @@ public class SensorDataStorageImpl implements SensorDataStorage {
     private String fileName;
 
     public SensorDataStorageImpl(String fileName) throws FileNotFoundException {
-        outputStream = new FileOutputStream(fileName);
+
         this.fileName = fileName;
     }
 
 
     @Override
     public void saveData(long time, float[] values) throws IOException {
-
+        if(outputStream==null) outputStream = new FileOutputStream(fileName);
         dataOutputStream = new DataOutputStream(outputStream);
 
         dataOutputStream.writeLong(time);
@@ -41,6 +41,7 @@ public class SensorDataStorageImpl implements SensorDataStorage {
 
         long time;
         float[] values;
+        int count;
 
         inputStream = new FileInputStream(fileName);
         dataInputStream = new DataInputStream(inputStream);
@@ -51,11 +52,12 @@ public class SensorDataStorageImpl implements SensorDataStorage {
         while (dataInputStream.available() > 0) {
 
             time = dataInputStream.readLong();
-            int count = dataInputStream.readInt();
+            count = dataInputStream.readInt();
             values = new float[count];
-
             for (int j = 0; j < count; j++) {
+
                 values[j] = dataInputStream.readFloat();
+
             }
 
 
@@ -106,6 +108,6 @@ public class SensorDataStorageImpl implements SensorDataStorage {
 
     @Override
     public void close() throws IOException {
-        outputStream.close();
+        if(outputStream!=null) outputStream.close();
     }
 }

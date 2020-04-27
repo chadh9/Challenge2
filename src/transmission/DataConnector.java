@@ -8,6 +8,7 @@ import java.net.Socket;
 public class DataConnector implements DataConnection, Runnable{
 
     private ServerSocket serverSocket;
+    private Socket socket=null;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
 
@@ -34,26 +35,30 @@ public class DataConnector implements DataConnection, Runnable{
 
     @Override
     public DataInputStream getDataInputStream() throws IOException {
+        while (dataInputStream==null){
+            System.out.print(".");
+        }
         return dataInputStream;
 
     }
 
     @Override
     public DataOutputStream getDataOutputStream() throws IOException {
+
         return dataOutputStream;
     }
 
-    @Override
     public void run() {
-        Socket socket = null;
         try {
             socket = serverSocket.accept();
             dataInputStream= new DataInputStream(socket.getInputStream());
+            System.out.println("connected");
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
+
 
 
 }

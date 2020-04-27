@@ -1,6 +1,7 @@
 package filepersistence;
 
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ class SensorDataStorageTest {
     @BeforeEach
     void start() throws FileNotFoundException {
         storage = new SensorDataStorageImpl("initTest.txt");
+        storage.clear();
     }
 
 
@@ -39,6 +41,21 @@ class SensorDataStorageTest {
         Assertions.assertArrayEquals((float[]) list.get(1), new float[]{(float) 1.0, (float) 2.0});
     }
 
+    @Test
+    void saveData_success3() throws IOException {
+        storage.saveData(1, new float[]{(float) 1.0, (float) 2.0});
+        storage.saveData(2, new float[]{(float) 1.0, (float) 2.0});
+        storage.saveData(3, new float[]{(float) 1.0, (float) 2.0});
+        List list = storage.read(0);
+        List list2 = storage.read(1);
+        List list3 =storage.read(2);
+
+        Assertions.assertNotEquals(0, new File("initTest.txt").length());
+        Assertions.assertEquals(list.get(0), (long) 1);
+        Assertions.assertArrayEquals((float[]) list.get(1), new float[]{(float) 1.0, (float) 2.0});
+        Assertions.assertEquals(list2.get(0), (long) 2);
+        Assertions.assertEquals(list3.get(0), (long) 3);
+    }
     @Test
     void saveData_MaxLong() throws IOException {
         storage.saveData(Long.MAX_VALUE, new float[]{(float) 1.0, (float) 2.0});
@@ -64,7 +81,7 @@ class SensorDataStorageTest {
     }
 
     @Test
-    void saveData_fail_stream_closed() throws IOException {
+    void saveData_stillworks_after_stream_closed() throws IOException {
 
         storage=new SensorDataStorageImpl("readonly.txt");
         storage.close();
@@ -73,32 +90,16 @@ class SensorDataStorageTest {
 
         try {
             storage.saveData(1, new float[]{(0)});
+        }
+        catch (IOException ex){
             Assertions.fail();
         }
-        catch (IOException ex){}
         finally {
             file.delete();
         }
     }
 
-    @Test
-    void constructor_FileNotFound_Exception_when_readonly() throws IOException {
 
-        storage=new SensorDataStorageImpl("readonly.txt");
-        storage.close();
-
-        File file = new File("readonly.txt");
-        file.setReadOnly();
-
-        try {
-            storage=new SensorDataStorageImpl("readonly.txt");
-            Assertions.fail();
-        }
-        catch (FileNotFoundException ex){}
-        finally {
-            file.delete();
-        }
-    }
 
     @Test
     void read_success() throws IOException {
