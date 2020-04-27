@@ -9,12 +9,33 @@ import org.junit.jupiter.api.Test;
 import transmission.DataConnection;
 import transmission.DataConnector;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 public class SensorDataTransmissionTest {
     private static final int PORTNUMBER = 9876;
+
+    private static final int TEST_INT = 42;
+
+    @Test
+    public void gutConnectionTest1() throws IOException {
+        // open server side
+        DataConnection serverSide = new DataConnector(PORTNUMBER);
+
+        // open client side
+        DataConnection clientSide = new DataConnector("localhost", PORTNUMBER);
+
+        DataOutputStream dataOutputStream = clientSide.getDataOutputStream();
+        dataOutputStream.writeInt(TEST_INT);
+
+        DataInputStream dataInputStream = serverSide.getDataInputStream();
+        int readValue = dataInputStream.readInt();
+
+        Assertions.assertEquals(TEST_INT, readValue);
+    }
 
     @Test
     public void gutTransmissionTest() throws IOException {
@@ -41,12 +62,10 @@ public class SensorDataTransmissionTest {
 
         // create connections
 
-        Runnable receiverConnection = new DataConnector(PORTNUMBER);
-        new Thread(receiverConnection).start();
-
+        DataConnection receiverConnection = new DataConnector(PORTNUMBER);
 
         // create receiver
-        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver((DataConnection) receiverConnection, dataStorage);
+        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(receiverConnection, dataStorage);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
         //                                              sender side                                          //
@@ -62,28 +81,24 @@ public class SensorDataTransmissionTest {
         //                               execute communication and test                                      //
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        new Thread(sensorDataReceiver).start();
-
+        receiverConnection.connect();
 
         // send data with TCP
-        sensorDataSender.sendData(sensorName, timeStamp, valueSet);
         sensorDataSender.sendData(sensorName, timeStamp, valueSet);
 
         // test if stored
         SensorDataStorage dataStorageReceived = sensorDataReceiver.getStorage();
 
+        sensorDataReceiver.fetch();
         // TODO - get data and test
 
         // just dummy values
 
 
         List list = dataStorageReceived.read(0);
-    //    List list1 = dataStorageReceived.read(1);
 
         Assertions.assertEquals(timeStamp, list.get(0));
         Assertions.assertArrayEquals(valueSet, (float[]) list.get(1));
-      //  Assertions.assertEquals((long)1, list1.get(0));
-        //Assertions.assertArrayEquals(new float[]{1}, (float[]) list1.get(1));
 
         // TODO: test values*/
     }

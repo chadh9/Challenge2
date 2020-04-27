@@ -5,7 +5,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class DataConnector implements DataConnection, Runnable{
+public class DataConnector implements DataConnection{
 
     private ServerSocket serverSocket;
     private DataInputStream dataInputStream;
@@ -43,8 +43,8 @@ public class DataConnector implements DataConnection, Runnable{
         return dataOutputStream;
     }
 
-    @Override
-    public void run() {
+
+    public void connect() {
         Socket socket = null;
         try {
             socket = serverSocket.accept();

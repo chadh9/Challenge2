@@ -46,4 +46,27 @@ public class SensorDataReceiver extends Thread {
             e.printStackTrace();
         }
     }
+
+    public void fetch() throws IOException {
+
+        DataInputStream dataInputStream = connection.getDataInputStream();
+        if (dataInputStream.available() > 0) {
+
+
+            String name = dataInputStream.readUTF();
+            long date = dataInputStream.readLong();
+            int count = dataInputStream.readInt();
+            float[] values = new float[count];
+
+            for (int i = 0; i < count; i++) {
+                values[i] = dataInputStream.readFloat();
+            }
+            storage.saveData(date, values);
+            System.out.println("success");
+
+
+        }
+
+
+    }
 }

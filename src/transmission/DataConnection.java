@@ -10,5 +10,6 @@ public interface DataConnection {
 
     DataOutputStream getDataOutputStream() throws IOException;
 
+    void connect();
 }
 
