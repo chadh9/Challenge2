@@ -8,11 +8,9 @@ import org.junit.jupiter.api.Test;
 import transmission.DataConnection;
 import transmission.DataConnector;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class SensorDataTransmissionTest {
     private static final int PORTNUMBER = 9876;
@@ -26,9 +24,6 @@ public class SensorDataTransmissionTest {
         valueSet[0] = (float) 0.7;
         valueSet[1] = (float) 1.2;
         valueSet[2] = (float) 2.1;
-
-
-
 
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,14 +58,13 @@ public class SensorDataTransmissionTest {
         //                               execute communication and test                                      //
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        Thread t =new Thread(sensorDataReceiver);
+        Thread t = new Thread(sensorDataReceiver);
         t.start();
 
 
         // send data with TCP
         sensorDataSender.sendData(sensorName, timeStamp, valueSet);
         sensorDataSender.sendData(sensorName, 1, new float[]{1});
-
 
 
         // test if stored
@@ -85,15 +79,15 @@ public class SensorDataTransmissionTest {
 
         Assertions.assertEquals(timeStamp, list1.get(0));
         Assertions.assertArrayEquals(valueSet, (float[]) list1.get(1));
-        Assertions.assertEquals((long)1, list2.get(0));
-        Assertions.assertArrayEquals( new float[]{1}, (float[]) list2.get(1));
+        Assertions.assertEquals((long) 1, list2.get(0));
+        Assertions.assertArrayEquals(new float[]{1}, (float[]) list2.get(1));
 
     }
 
     @Test
     public void test2() throws IOException {
         SensorDataStorage sensorDataStorage = new SensorDataStorageImpl("MyGoodOldSensor.txt");
-        List list=sensorDataStorage.read(0);
+        List list = sensorDataStorage.read(0);
 
         float[] valueSet = new float[3];
         valueSet[0] = (float) 0.7;
@@ -115,7 +109,6 @@ public class SensorDataTransmissionTest {
         DataConnection clientSide = new DataConnector("localhost", PORTNUMBER);
 
 
-
         Thread t = new Thread((Runnable) serverSide);
         t.start();
         DataOutputStream dataOutputStream = clientSide.getDataOutputStream();
@@ -127,6 +120,46 @@ public class SensorDataTransmissionTest {
         Assertions.assertEquals(TEST_INT, readValue);
     }
 
+    @Test
+    public void EOFifnotjoined() throws IOException, InterruptedException {
+        String sensorName = "MyGoodOldSensor.txt"; // does not change
+        long timeStamp = System.currentTimeMillis();
+        float[] valueSet = new float[3];
+        valueSet[0] = (float) 0.7;
+        valueSet[1] = (float) 1.2;
+        valueSet[2] = (float) 2.1;
+
+
+        SensorDataStorage dataStorage = new SensorDataStorageImpl(sensorName);
+        DataConnector receiverConnection = new DataConnector(PORTNUMBER);
+        new Thread(receiverConnection).start();
+        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(receiverConnection, dataStorage);
+
+        DataConnection senderConnection = new DataConnector("localhost", PORTNUMBER);
+        SensorDataSender sensorDataSender = new SensorDataSender(senderConnection);
+
+        Thread t = new Thread(sensorDataReceiver);
+        t.start();
+
+
+        sensorDataSender.sendData(sensorName, timeStamp, valueSet);
+
+
+        // test if stored
+        SensorDataStorage dataStorageReceived = sensorDataReceiver.getStorage();
+
+        try {
+            List list1 = dataStorageReceived.read(0);
+            Assertions.fail();
+        } catch (EOFException e) {
+
+        }
+        catch (NoSuchElementException e){
+
+        }
+
+
+    }
 
 
 }
