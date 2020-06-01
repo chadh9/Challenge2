@@ -1,4 +1,4 @@
-package schiffeversenken;
+package schiffeversenken.austausch;
 
 import java.io.IOException;
 

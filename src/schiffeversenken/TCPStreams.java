@@ -45,7 +45,6 @@ public class TCPStreams implements Streams, Runnable{
     @Override
     public void run() {
         try {
-
             host();
         } catch (IOException e) {
             e.printStackTrace();
