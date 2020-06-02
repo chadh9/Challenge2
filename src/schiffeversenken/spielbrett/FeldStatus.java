@@ -1,7 +1,7 @@
 package schiffeversenken.spielbrett;
 
 public enum FeldStatus {
-    UNKBEKANNT(0), WASSER(1), SCHIFF(2);
+    UNBEKANNT(0), WASSER(1), SCHIFF(2);
 
     private int value;
 

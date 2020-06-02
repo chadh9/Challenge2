@@ -3,7 +3,7 @@ package schiffeversenken.spielbrett;
 import java.util.Arrays;
 
 public class EigenesFeld{
-    
+
     private int groesse = 10;
     private FeldStatus[][] feld;
 
@@ -32,7 +32,7 @@ public class EigenesFeld{
                     case SCHIFF:
                         System.out.print("S  ");
                         break;
-                    case UNKBEKANNT:
+                    case UNBEKANNT:
                         System.out.print("?  ");
                 }
             }
@@ -43,5 +43,17 @@ public class EigenesFeld{
 
     public void remaining(){
 
+    }
+
+    public FeldStatus[][] getFeld() {
+        return feld;
+    }
+
+    public int getGroesse() {
+        return groesse;
+    }
+
+    public void setFeld(FeldStatus[][] feld) {
+        this.feld = feld;
     }
 }

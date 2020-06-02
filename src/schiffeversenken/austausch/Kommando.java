@@ -1,11 +1,11 @@
 package schiffeversenken.austausch;
 
-public enum SchiffeVersenkenKommando {
+public enum Kommando {
     REIHENFOLGEWUERFELN (0), KOORDINATE (1), KAPITULATION (2), BESTAETIGEN (3);
 
     private int value;
 
-    SchiffeVersenkenKommando(int i) {
+    Kommando(int i) {
         value=i;
     }
 
