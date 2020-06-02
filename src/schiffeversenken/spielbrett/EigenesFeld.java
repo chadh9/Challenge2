@@ -41,8 +41,15 @@ public class EigenesFeld{
     }
 
 
-    public void remaining(){
-
+    public int remaining(){
+        int count=0;
+        for (int i = 0; i < groesse; i++) {
+            for (int j = 0; j < groesse; j++) {
+                if (feld[i][j]==FeldStatus.SCHIFF);
+                    count++;
+                }
+            }
+        return count;
     }
 
     public FeldStatus[][] getFeld() {
@@ -55,5 +62,11 @@ public class EigenesFeld{
 
     public void setFeld(FeldStatus[][] feld) {
         this.feld = feld;
+    }
+
+    public void getroffen(int x, int y){
+        if (feld[x][y]==FeldStatus.SCHIFF){
+            feld[x][y]=FeldStatus.WASSER;
+        }
     }
 }

@@ -18,5 +18,12 @@ public class GegnerFeld extends EigenesFeld {
         }
     }
 
+    public void getroffen(boolean schiff, int x,int y){
+        if (schiff){
+            getFeld()[x][y]=FeldStatus.SCHIFF;
+        }
+        else getFeld()[x][y]=FeldStatus.WASSER;
+    }
+
 
 }
