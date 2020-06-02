@@ -11,7 +11,8 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
 
     private SchiffeVersenkenStatus status;
     private TCPStreams tcpStreams;
-
+    private int x;
+    private int y;
     private int randomInt;
 
 
