@@ -1,6 +1,7 @@
 package schiffeversenken.austausch;
 
 import schiffeversenken.TCPStreams;
+import schiffeversenken.protocolBinding.Kommando;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,7 +25,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
 
         try {
             DataOutputStream dos=tcpStreams.getdos();
-            dos.writeInt(Kommando.REIHENFOLGEWUERFELN.getValue());
+            dos.writeInt(Kommando.REIHENFOLGEWUERFELN);
             dos.writeInt(new Random().nextInt());
 
 
@@ -39,11 +40,11 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
         if (status != SchiffeVersenkenStatus.SPIELSTART) {
             throw new StatusException();
 
-
         }
+
         try {
             DataInputStream dis=tcpStreams.getdis();
-            if(dis.readInt() == Kommando.REIHENFOLGEWUERFELN.getValue()){
+            if(dis.readInt() == Kommando.REIHENFOLGEWUERFELN){
                 int gegnerWert=dis.readInt();
                 if (gegnerWert>randomInt){
                     /*
@@ -56,6 +57,8 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
                      */
                 }
                 else; //KEIN STATECHANGE: WÜRFELSENDEN
+
+
 
             };
 

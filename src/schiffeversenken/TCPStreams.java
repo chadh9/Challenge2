@@ -34,12 +34,12 @@ public class TCPStreams implements Streams, Runnable{
 
     @Override
     public DataInputStream getdis() {
-        return null;
+        return dis;
     }
 
     @Override
     public DataOutputStream getdos() {
-        return null;
+        return dos;
     }
 
     @Override
