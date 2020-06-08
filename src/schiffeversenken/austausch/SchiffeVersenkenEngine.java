@@ -36,7 +36,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
     }
 
     @Override
-    public void wuerfelEmpfangen() throws StatusException {
+    public void wuerfelEmpfangen(int random) throws StatusException {
         if (status != SchiffeVersenkenStatus.SPIELSTART) {
             throw new StatusException();
 
@@ -70,7 +70,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
     }
 
     @Override
-    public void empfangeKoordinate() throws StatusException {
+    public void empfangeKoordinate(int x, int y) throws StatusException {
         if (status != SchiffeVersenkenStatus.VERSENKEN) {
             throw new StatusException();
         }
@@ -84,7 +84,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
     }
 
     @Override
-    public void empfangeBestaetigen() throws StatusException {
+    public void empfangeBestaetigen(int i) throws StatusException {
         if (status != SchiffeVersenkenStatus.BESTAETIGEN) {
             throw new StatusException();
         }
