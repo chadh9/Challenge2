@@ -6,4 +6,8 @@ public interface Feld {
     int remaining();
     int remaining(FeldStatus feldStatus);
     FeldStatus[][] getFeld();
-}
+    void setFeld(FeldStatus[][] feld);
+
+    }
+
+

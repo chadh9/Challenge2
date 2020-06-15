@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 public class StreamBindingReceiver extends Thread {
+
     private DataInputStream dis;
     private SchiffeVersenkenEmpfangen receiver;
 

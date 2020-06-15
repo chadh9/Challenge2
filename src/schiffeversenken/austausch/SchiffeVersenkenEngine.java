@@ -20,6 +20,17 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
     private int x;
     private int y;
 
+    public SchiffeVersenkenStatus getStatus() {
+        return status;
+    }
+
+    public Feld getSpielerfeld() {
+        return spielerfeld;
+    }
+
+    public Feld getGegnerfeld() {
+        return gegnerfeld;
+    }
 
     public void setDos(DataOutputStream dos) {
         this.dos = dos;
@@ -33,6 +44,9 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
         this.gegnerfeld = gegnerfeld;
     }
 
+    public void setStatus(SchiffeVersenkenStatus status){
+        this.status=status;
+    }
 
 
     @Override
@@ -43,9 +57,8 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
         }
 
         try {
-            dos.writeInt(Kommando.REIHENFOLGEWUERFELN);
 
-            randomInt=new Random().nextInt();
+            randomInt=i;
             dos.writeInt(randomInt);
 
 
@@ -77,6 +90,9 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
             throw new StatusException();
         }
         System.out.println("Gegner schießt auf: " +x+" "+y);
+
+        this.x=x;
+        this.y=y;
 
         if(spielerfeld.getFeld()[x][y]!=FeldStatus.WASSER
         ){
@@ -120,11 +136,14 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
 
             case 2:
                 System.out.println("Versenkt!");
+
                 if(gegnerfeld.remaining()==0) {
                     gegnerfeld.getFeld()[x][y]=FeldStatus.SCHIFF;
                     status=SchiffeVersenkenStatus.BEENDEN;
                     System.out.println("Alle versenkt...Gewonnen!");
                 }
+                else status=SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
+
         }
     }
 
@@ -168,6 +187,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
         }
         else dos.writeInt(1);
 
+        status=SchiffeVersenkenStatus.VERSENKEN_SENDEN;
     }
 
 
