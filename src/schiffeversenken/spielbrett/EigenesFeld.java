@@ -2,7 +2,7 @@ package schiffeversenken.spielbrett;
 
 import java.util.Arrays;
 
-public class EigenesFeld{
+public class EigenesFeld implements Feld{
 
     private int groesse = 10;
     private FeldStatus[][] feld;
@@ -29,9 +29,25 @@ public class EigenesFeld{
                     case WASSER:
                         System.out.print("W  ");
                         break;
-                    case SCHIFF:
+                    case SCHLACHTSCHIFF:
                         System.out.print("S  ");
                         break;
+                    case KREUZER_I:
+                    case KREUZER_II:
+                        System.out.print("C  ");
+                        break;
+                    case ZERSTOERER_I:
+                    case ZERSTOERER_II:
+                    case ZERSTOERER_III:
+                        System.out.print("D  ");
+                        break;
+                    case UBOOT_I:
+                    case UBOOT_II:
+                    case UBOOT_III:
+                    case UBOOT_IV:
+                        System.out.print("U  ");
+                        break;
+                    case SCHIFF: break;
                     case UNBEKANNT:
                         System.out.print("?  ");
                 }
@@ -45,10 +61,22 @@ public class EigenesFeld{
         int count=0;
         for (int i = 0; i < groesse; i++) {
             for (int j = 0; j < groesse; j++) {
-                if (feld[i][j]==FeldStatus.SCHIFF);
+                if (feld[i][j]!=FeldStatus.WASSER||
+                        feld[i][j]!=FeldStatus.VERSENKT)
                     count++;
                 }
             }
+        return count;
+    }
+
+    public int remaining(FeldStatus feldStatus){
+        int count=0;
+        for (int i = 0; i < groesse; i++) {
+            for (int j = 0; j < groesse; j++) {
+                if (feld[i][j]!=feldStatus)
+                    count++;
+            }
+        }
         return count;
     }
 
@@ -64,9 +92,4 @@ public class EigenesFeld{
         this.feld = feld;
     }
 
-    public void getroffen(int x, int y){
-        if (feld[x][y]==FeldStatus.SCHIFF){
-            feld[x][y]=FeldStatus.WASSER;
-        }
-    }
 }

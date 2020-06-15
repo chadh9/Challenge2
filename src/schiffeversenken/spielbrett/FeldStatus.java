@@ -1,15 +1,8 @@
 package schiffeversenken.spielbrett;
 
 public enum FeldStatus {
-    UNBEKANNT(0), WASSER(1), SCHIFF(2);
+    UNBEKANNT, WASSER, SCHLACHTSCHIFF, KREUZER_I, KREUZER_II, ZERSTOERER_I,ZERSTOERER_II,ZERSTOERER_III, UBOOT_I, UBOOT_II,UBOOT_III,UBOOT_IV,SCHIFF, VERSENKT;
 
-    private int value;
 
-    FeldStatus(int i) {
-        value=i;
-    }
 
-    public int getValue() {
-        return value;
-    }
 }
