@@ -17,56 +17,60 @@ class SchiffeVersenkenEngineTest {
     SchiffeVersenkenEngine sender;
     DataInputStream dis;
     int size =10;
-
-    @BeforeEach
-    void init() throws FileNotFoundException {
-        sender = new SchiffeVersenkenEngine();
-        sender.setSpielerfeld(new EigenesFeld());
-        sender.setGegnerfeld(new GegnerFeld());
-        sender.setDos(new DataOutputStream(new FileOutputStream("test.txt")));
-        dis = new DataInputStream(new FileInputStream("test.txt"));
-    }
-
-    @Test
-    void reihenfolgeWuerfeln_nicht_spielstart() throws IOException {
-        try {
-            sender.reihenfolgeWuerfeln(1);
-            fail();
-        } catch (StatusException e) {
+    /*
+        @BeforeEach
+        void init() throws FileNotFoundException {
+            sender = new SchiffeVersenkenEngine();
+            sender.setSpielerfeld(new EigenesFeld());
+            sender.setGegnerfeld(new GegnerFeld());
+            sender.setDos(new DataOutputStream(new FileOutputStream("test.txt")));
+            dis = new DataInputStream(new FileInputStream("test.txt"));
         }
-    }
 
-    @Test
-    void reihenfolgeWuerfeln() throws IOException {
-        sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
-        sender.reihenfolgeWuerfeln(1);
-        assertEquals(dis.readInt(), 1);
-    }
+        @Test
+        void reihenfolgeWuerfeln_nicht_spielstart() throws IOException {
+            try {
+                sender.reihenfolgeWuerfeln(1);
+                fail();
+            } catch (StatusException e) {
+            }
+        }
 
-    @Test
-    void wuerfelEmpfangen_verloren() throws StatusException {
-        sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
-        sender.reihenfolgeWuerfeln(1);
-        sender.wuerfelEmpfangen(2);
-        assertEquals(sender.getStatus(), SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN);
-    }
+        @Test
+        void reihenfolgeWuerfeln() throws IOException {
+            sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
+            sender.reihenfolgeWuerfeln(1);
+            assertEquals(dis.readInt(), 1);
+        }
 
-    @Test
-    void wuerfelEmpfangen_sieg() throws StatusException {
-        sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
-        sender.reihenfolgeWuerfeln(1);
-        sender.wuerfelEmpfangen(0);
-        assertEquals(sender.getStatus(), SchiffeVersenkenStatus.VERSENKEN_SENDEN);
-    }
+        @Test
+        void wuerfelEmpfangen_verloren() throws StatusException {
+            sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
+            sender.reihenfolgeWuerfeln(1);
+            sender.wuerfelEmpfangen(2);
+            assertEquals(sender.getStatus(), SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN);
+        }
 
-    @Test
-    void wuerfelEmpfangen_unentschieden() throws StatusException {
-        sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
-        sender.reihenfolgeWuerfeln(1);
-        sender.wuerfelEmpfangen(1);
-        assertEquals(sender.getStatus(), SchiffeVersenkenStatus.SPIELSTART);
-    }
+        @Test
+        void wuerfelEmpfangen_sieg() throws StatusException {
+            sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
+            sender.reihenfolgeWuerfeln(1);
+            sender.wuerfelEmpfangen(0);
+            assertEquals(sender.getStatus(), SchiffeVersenkenStatus.VERSENKEN_SENDEN);
+        }
 
+
+
+        @Test
+        void wuerfelEmpfangen_unentschieden() throws StatusException {
+            sender.setStatus(SchiffeVersenkenStatus.SPIELSTART);
+            sender.reihenfolgeWuerfeln(1);
+            sender.wuerfelEmpfangen(1);
+            assertEquals(sender.getStatus(), SchiffeVersenkenStatus.SPIELSTART);
+        }
+
+
+     */
     @Test
     void empfangeKoordinate_treffer() throws StatusException {
         sender.setStatus(SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN);
@@ -131,6 +135,7 @@ class SchiffeVersenkenEngineTest {
 
         assertEquals(sender.getStatus(),SchiffeVersenkenStatus.BEENDEN);
     }
+    /*
     @Test
     void sendeKoordinate() throws IOException {
         sender.setStatus(SchiffeVersenkenStatus.VERSENKEN_SENDEN);
@@ -153,4 +158,6 @@ class SchiffeVersenkenEngineTest {
         sender.sendeBestaetigen();
         assertEquals(sender.getStatus(), SchiffeVersenkenStatus.VERSENKEN_SENDEN);
     }
+
+     */
 }

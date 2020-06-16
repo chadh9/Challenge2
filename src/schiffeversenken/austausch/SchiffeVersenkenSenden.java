@@ -9,6 +9,6 @@ public interface SchiffeVersenkenSenden {
     void sendeKoordinate(int x,int y) throws IOException;
     void sendeKapitulation() throws IOException;
 
-    void sendeBestaetigen() throws IOException;
+    void sendeBestaetigen(int i) throws IOException;
 
 }

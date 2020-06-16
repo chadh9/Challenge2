@@ -18,14 +18,19 @@ public class StreamBindingReceiver extends Thread {
 
 
     public void wuerfelEmpfangen() throws IOException {
+
         int random = dis.readInt();
+        System.out.println("random "+random);
         receiver.wuerfelEmpfangen(random);
     }
 
 
     public void empfangeKoordinate() throws IOException{
+
+
         int x = dis.readInt();
         int y = dis.readInt();
+        System.out.println(x+y);
         receiver.empfangeKoordinate(x,y);
     }
 
@@ -44,17 +49,36 @@ public class StreamBindingReceiver extends Thread {
     public void run() {
         boolean again = true;
         while (again){
-            try {
-                int cmd= dis.readInt();
-                switch (cmd){
-                    case Kommando.REIHENFOLGEWUERFELN: wuerfelEmpfangen(); break;
-                    case Kommando.KOORDINATE: empfangeKoordinate(); break;
-                    case Kommando.KAPITULATION: empfangeKapitulation();break;
-                    case Kommando.BESTAETIGEN: empfangeBestaetigen();break;
-                    default: again = false;
-                        System.out.println("Unknown cmd" + cmd);
-                }
 
+            try {
+
+
+                if(dis.available()>0) {
+
+                    int cmd = dis.readInt();
+
+                    System.out.println("reading command "+cmd);
+
+                    switch (cmd) {
+                        case Kommando.REIHENFOLGEWUERFELN:
+
+                            wuerfelEmpfangen();
+                            break;
+                        case Kommando.KOORDINATE:
+                            empfangeKoordinate();
+                            break;
+                        case Kommando.KAPITULATION:
+                            empfangeKapitulation();
+                            break;
+                        case Kommando.BESTAETIGEN:
+                            empfangeBestaetigen();
+                            break;
+                        default:
+                            again = false;
+                            System.out.println("Unknown cmd" + cmd);
+                    }
+
+                }
             } catch (StatusException e){
                 System.out.println("STATUSEXCEPTION;"+e.getLocalizedMessage());
                 again=false;

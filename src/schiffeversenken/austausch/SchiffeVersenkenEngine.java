@@ -10,16 +10,23 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, SchiffeVersenkenSenden {
+public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage {
 
     private SchiffeVersenkenStatus status;
-    private DataOutputStream dos;
+
     private int randomInt;
     private Feld spielerfeld;
     private Feld gegnerfeld;
     private int x;
     private int y;
+    private SchiffeVersenkenSenden sender;
 
+    public SchiffeVersenkenEngine(SchiffeVersenkenSenden sender){
+        this.sender=sender;
+        status=SchiffeVersenkenStatus.SPIELSTART;
+    }
+
+    @Override
     public SchiffeVersenkenStatus getStatus() {
         return status;
     }
@@ -30,10 +37,6 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
 
     public Feld getGegnerfeld() {
         return gegnerfeld;
-    }
-
-    public void setDos(DataOutputStream dos) {
-        this.dos = dos;
     }
 
     public void setSpielerfeld(Feld spielerfeld) {
@@ -49,24 +52,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
     }
 
 
-    @Override
-    public void reihenfolgeWuerfeln(int i) throws StatusException {
 
-        if (status != SchiffeVersenkenStatus.SPIELSTART) {
-            throw new StatusException();
-        }
-
-        try {
-
-            randomInt=i;
-            dos.writeInt(randomInt);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Override
     public void wuerfelEmpfangen(int random) throws StatusException {
@@ -74,11 +60,14 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
             throw new StatusException();
         }
 
+        System.out.println("int "+randomInt+ " "+ random);
+
         if (random>randomInt){
             status=SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
 
         }
         else if (random<randomInt) {
+
             status = SchiffeVersenkenStatus.VERSENKEN_SENDEN;
         }
 
@@ -148,30 +137,56 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
     }
 
 
+
+
+
+
+
+
+
+
+
     @Override
-    public void sendeKoordinate(int x, int y) throws IOException {
-        if (status != SchiffeVersenkenStatus.VERSENKEN_SENDEN) {
+    public void wuerfeln() throws StatusException {
+        if (status != SchiffeVersenkenStatus.SPIELSTART) {
             throw new StatusException();
         }
-        this.x=x;
-        this.y=y;
 
-        dos.writeInt(x);
-        dos.writeInt(y);
+        try {
+            Random random=new Random();
 
+            randomInt=random.nextInt();
+
+
+            sender.reihenfolgeWuerfeln(randomInt);
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void sendeKapitulation() throws StatusException {
+    public void versenken(int x ,int y) throws IOException {
+        if (status != SchiffeVersenkenStatus.VERSENKEN_SENDEN) {
+            throw new StatusException();
+        }
+        sender.sendeKoordinate(x,y);
+    }
+
+    @Override
+    public void kapitulation() throws IOException {
         if (status != SchiffeVersenkenStatus.VERSENKEN_SENDEN) {
             throw new StatusException();
         }
         System.out.println("Kapituliere... Verloren!");
+        sender.sendeKapitulation();
         status=SchiffeVersenkenStatus.BEENDEN;
     }
 
     @Override
-    public void sendeBestaetigen() throws IOException {
+    public void bestaetigen() throws IOException {
         if (status != SchiffeVersenkenStatus.BESTAETIGEN_SENDEN) {
             throw new StatusException();
         }
@@ -182,13 +197,11 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Schiff
 
             spielerfeld.getFeld()[x][y]=FeldStatus.VERSENKT;
 
-            if(spielerfeld.remaining(feldStatus)==0) dos.writeInt(2);
-            else dos.writeInt(0);
+            if(spielerfeld.remaining(feldStatus)==0) sender.sendeBestaetigen(2);
+            else sender.sendeBestaetigen(0);
         }
-        else dos.writeInt(1);
+        else sender.sendeBestaetigen(1);
 
         status=SchiffeVersenkenStatus.VERSENKEN_SENDEN;
     }
-
-
 }
