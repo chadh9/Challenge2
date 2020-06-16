@@ -1,12 +1,10 @@
 package schiffeversenken.austausch;
 
-import schiffeversenken.TCPStreams;
-import schiffeversenken.protocolBinding.Kommando;
+import schiffeversenken.spielbrett.EigenesFeld;
 import schiffeversenken.spielbrett.Feld;
 import schiffeversenken.spielbrett.FeldStatus;
+import schiffeversenken.spielbrett.GegnerFeld;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
@@ -14,16 +12,22 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
 
     private SchiffeVersenkenStatus status;
 
-    private int randomInt;
+    private int sentrandom = 0;
+    private int spielerRandom;
+    private int gegnerRandom;
+
     private Feld spielerfeld;
     private Feld gegnerfeld;
     private int x;
     private int y;
     private SchiffeVersenkenSenden sender;
 
-    public SchiffeVersenkenEngine(SchiffeVersenkenSenden sender){
-        this.sender=sender;
-        status=SchiffeVersenkenStatus.SPIELSTART;
+    public SchiffeVersenkenEngine(SchiffeVersenkenSenden sender) {
+        this.sender = sender;
+        status = SchiffeVersenkenStatus.SPIELSTART;
+
+        spielerfeld=new EigenesFeld();
+        gegnerfeld=new GegnerFeld();
     }
 
     @Override
@@ -47,12 +51,18 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
         this.gegnerfeld = gegnerfeld;
     }
 
-    public void setStatus(SchiffeVersenkenStatus status){
-        this.status=status;
+    public void setStatus(SchiffeVersenkenStatus status) {
+        this.status = status;
     }
 
-
-
+    private void decide() {
+        System.out.println("int " + spielerRandom + " " + gegnerRandom);
+        if (gegnerRandom > spielerRandom) {
+            status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
+        } else if (gegnerRandom < spielerRandom) {
+            status = SchiffeVersenkenStatus.VERSENKEN_SENDEN;
+        }
+    }
 
     @Override
     public void wuerfelEmpfangen(int random) throws StatusException {
@@ -60,17 +70,12 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
             throw new StatusException();
         }
 
-        System.out.println("int "+randomInt+ " "+ random);
+        gegnerRandom = random;
 
-        if (random>randomInt){
-            status=SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
-
+        if (sentrandom==1) {
+            decide();
         }
-        else if (random<randomInt) {
-
-            status = SchiffeVersenkenStatus.VERSENKEN_SENDEN;
-        }
-
+        else sentrandom=2;
     }
 
     @Override
@@ -78,20 +83,18 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
         if (status != SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN) {
             throw new StatusException();
         }
-        System.out.println("Gegner schießt auf: " +x+" "+y);
+        System.out.println("Gegner schießt auf: " + x + " " + y);
 
-        this.x=x;
-        this.y=y;
+        this.x = x;
+        this.y = y;
 
-        if(spielerfeld.getFeld()[x][y]!=FeldStatus.WASSER
-        ){
-            spielerfeld.getFeld()[x][y]=FeldStatus.VERSENKT;
+        if (spielerfeld.getFeld()[x][y] != FeldStatus.WASSER
+        ) {
+            spielerfeld.getFeld()[x][y] = FeldStatus.VERSENKT;
             System.out.println("Gegnerischer Treffer!");
-        }
+        } else System.out.println("Kein Treffer!");
 
-        else System.out.println("Kein Treffer!");
-
-        status=SchiffeVersenkenStatus.BESTAETIGEN_SENDEN;
+        status = SchiffeVersenkenStatus.BESTAETIGEN_SENDEN;
 
     }
 
@@ -102,7 +105,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
         }
 
         System.out.println("Gegner kapituliert... Gewonnen!");
-        status=SchiffeVersenkenStatus.BEENDEN;
+        status = SchiffeVersenkenStatus.BEENDEN;
     }
 
 
@@ -111,68 +114,58 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
         if (status != SchiffeVersenkenStatus.BESTAETIGEN_EMPFANGEN) {
             throw new StatusException();
         }
-        switch (i){
+        switch (i) {
             case 0:
                 System.out.println("Treffer!");
-                gegnerfeld.getFeld()[x][y]=FeldStatus.SCHIFF;
+                gegnerfeld.getFeld()[x][y] = FeldStatus.SCHIFF;
 
-                status=SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
+                status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
 
             case 1:
                 System.out.println("Verfehlt!");
-                gegnerfeld.getFeld()[x][y]=FeldStatus.WASSER;
-                status=SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
+                gegnerfeld.getFeld()[x][y] = FeldStatus.WASSER;
+                status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
 
             case 2:
                 System.out.println("Versenkt!");
 
-                if(gegnerfeld.remaining()==0) {
-                    gegnerfeld.getFeld()[x][y]=FeldStatus.SCHIFF;
-                    status=SchiffeVersenkenStatus.BEENDEN;
+                if (gegnerfeld.remaining() == 0) {
+                    gegnerfeld.getFeld()[x][y] = FeldStatus.SCHIFF;
+                    status = SchiffeVersenkenStatus.BEENDEN;
                     System.out.println("Alle versenkt...Gewonnen!");
-                }
-                else status=SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
+                } else status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
 
         }
     }
 
 
-
-
-
-
-
-
-
-
-
     @Override
-    public void wuerfeln() throws StatusException {
+    public void wuerfeln() throws StatusException, IOException {
         if (status != SchiffeVersenkenStatus.SPIELSTART) {
             throw new StatusException();
         }
 
-        try {
-            Random random=new Random();
 
-            randomInt=random.nextInt();
+        Random random = new Random();
+
+        spielerRandom = random.nextInt();
+
+        sender.reihenfolgeWuerfeln(spielerRandom);
+
+        if(sentrandom==2)
+            decide();
+        else sentrandom = 1;
 
 
-            sender.reihenfolgeWuerfeln(randomInt);
-
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
-    public void versenken(int x ,int y) throws IOException {
+    public void versenken(int x, int y) throws IOException {
         if (status != SchiffeVersenkenStatus.VERSENKEN_SENDEN) {
             throw new StatusException();
         }
-        sender.sendeKoordinate(x,y);
+        sender.sendeKoordinate(x, y);
+        status=SchiffeVersenkenStatus.BESTAETIGEN_EMPFANGEN;
     }
 
     @Override
@@ -182,7 +175,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
         }
         System.out.println("Kapituliere... Verloren!");
         sender.sendeKapitulation();
-        status=SchiffeVersenkenStatus.BEENDEN;
+        status = SchiffeVersenkenStatus.BEENDEN;
     }
 
     @Override
@@ -191,17 +184,16 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
             throw new StatusException();
         }
 
-        if(spielerfeld.getFeld()[x][y]!=FeldStatus.WASSER||
-                spielerfeld.getFeld()[x][y]!=FeldStatus.VERSENKT) {
-            FeldStatus feldStatus=spielerfeld.getFeld()[x][y];
+        if (spielerfeld.getFeld()[x][y] == FeldStatus.WASSER ||
+                spielerfeld.getFeld()[x][y] == FeldStatus.VERSENKT) {
+            FeldStatus feldStatus = spielerfeld.getFeld()[x][y];
 
-            spielerfeld.getFeld()[x][y]=FeldStatus.VERSENKT;
+            spielerfeld.getFeld()[x][y] = FeldStatus.VERSENKT;
 
-            if(spielerfeld.remaining(feldStatus)==0) sender.sendeBestaetigen(2);
+            if (spielerfeld.remaining(feldStatus) == 0) sender.sendeBestaetigen(2);
             else sender.sendeBestaetigen(0);
-        }
-        else sender.sendeBestaetigen(1);
+        } else sender.sendeBestaetigen(1);
 
-        status=SchiffeVersenkenStatus.VERSENKEN_SENDEN;
+        status = SchiffeVersenkenStatus.VERSENKEN_SENDEN;
     }
 }

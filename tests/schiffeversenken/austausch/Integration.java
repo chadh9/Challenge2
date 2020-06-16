@@ -21,7 +21,7 @@ public class Integration {
     DataOutputStream enemydos;
     DataInputStream dis;
     Thread t;
-
+    /*
     @BeforeEach
     void init() throws FileNotFoundException {
         schiffeVersenkenEngine = new SchiffeVersenkenEngine();
@@ -45,7 +45,7 @@ public class Integration {
     }
 
 
-/*
+
     @Test
     void sendData() throws IOException {
 

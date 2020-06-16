@@ -6,11 +6,12 @@ import java.io.IOException;
 
 public class Shortcut implements SchiffeVersenkenSenden {
 
-    private final SchiffeVersenkenEmpfangen receiver;
+    private SchiffeVersenkenEmpfangen receiver;
 
-    public Shortcut(SchiffeVersenkenEmpfangen receiver){
+    public void setReceiver(SchiffeVersenkenEmpfangen receiver){
         this.receiver=receiver;
     }
+
 
     @Override
     public void reihenfolgeWuerfeln(int i) throws IOException {
@@ -29,6 +30,6 @@ public class Shortcut implements SchiffeVersenkenSenden {
 
     @Override
     public void sendeBestaetigen(int i) throws IOException {
-        receiver.empfangeKapitulation();
+        receiver.empfangeBestaetigen(i);
     }
 }
