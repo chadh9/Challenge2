@@ -56,10 +56,12 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
     }
 
     private void decide() {
-        System.out.println("int " + spielerRandom + " " + gegnerRandom);
+        System.out.println("du: " + spielerRandom + " gegner: " + gegnerRandom);
         if (gegnerRandom > spielerRandom) {
+            System.out.println("Gegner ist dran");
             status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
         } else if (gegnerRandom < spielerRandom) {
+            System.out.println("Du bist dran");
             status = SchiffeVersenkenStatus.VERSENKEN_SENDEN;
         }
     }
@@ -120,12 +122,12 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
                 gegnerfeld.getFeld()[x][y] = FeldStatus.SCHIFF;
 
                 status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
-
+                break;
             case 1:
                 System.out.println("Verfehlt!");
                 gegnerfeld.getFeld()[x][y] = FeldStatus.WASSER;
                 status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
-
+                break;
             case 2:
                 System.out.println("Versenkt!");
 
@@ -134,7 +136,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
                     status = SchiffeVersenkenStatus.BEENDEN;
                     System.out.println("Alle versenkt...Gewonnen!");
                 } else status = SchiffeVersenkenStatus.VERSENKEN_EMPFANGEN;
-
+                break;
         }
     }
 
@@ -166,6 +168,7 @@ public class SchiffeVersenkenEngine implements SchiffeVersenkenEmpfangen, Usage 
         }
         sender.sendeKoordinate(x, y);
         status=SchiffeVersenkenStatus.BESTAETIGEN_EMPFANGEN;
+
     }
 
     @Override

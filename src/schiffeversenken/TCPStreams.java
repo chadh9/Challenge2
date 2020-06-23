@@ -13,7 +13,8 @@ public class TCPStreams implements Streams, Runnable{
     DataInputStream dis;
     DataOutputStream dos;
 
-    int port;
+
+    private int port;
 
     public void setPort(int port){
         this.port=port;

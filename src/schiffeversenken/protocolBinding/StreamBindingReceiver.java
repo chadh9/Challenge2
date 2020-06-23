@@ -11,27 +11,27 @@ public class StreamBindingReceiver extends Thread {
     private DataInputStream dis;
     private SchiffeVersenkenEmpfangen receiver;
 
-    public StreamBindingReceiver(DataInputStream dataInputStream, SchiffeVersenkenEmpfangen receiver){
-        dis=dataInputStream;
-        this.receiver=receiver;
+    public StreamBindingReceiver(DataInputStream dataInputStream, SchiffeVersenkenEmpfangen receiver) {
+        dis = dataInputStream;
+        this.receiver = receiver;
     }
 
 
     public void wuerfelEmpfangen() throws IOException {
 
         int random = dis.readInt();
-        System.out.println("random "+random);
+        System.out.println("random " + random);
         receiver.wuerfelEmpfangen(random);
     }
 
 
-    public void empfangeKoordinate() throws IOException{
+    public void empfangeKoordinate() throws IOException {
 
 
         int x = dis.readInt();
         int y = dis.readInt();
-        System.out.println(x+y);
-        receiver.empfangeKoordinate(x,y);
+        System.out.println(x + y);
+        receiver.empfangeKoordinate(x, y);
     }
 
 
@@ -48,43 +48,41 @@ public class StreamBindingReceiver extends Thread {
     @Override
     public void run() {
         boolean again = true;
-        while (again){
+        while (again) {
 
             try {
 
 
-                if(dis.available()>0) {
+                int cmd = dis.readInt();
 
-                    int cmd = dis.readInt();
+                System.out.println("reading command " + cmd);
 
-                    System.out.println("reading command "+cmd);
+                switch (cmd) {
+                    case Kommando.REIHENFOLGEWUERFELN:
 
-                    switch (cmd) {
-                        case Kommando.REIHENFOLGEWUERFELN:
-
-                            wuerfelEmpfangen();
-                            break;
-                        case Kommando.KOORDINATE:
-                            empfangeKoordinate();
-                            break;
-                        case Kommando.KAPITULATION:
-                            empfangeKapitulation();
-                            break;
-                        case Kommando.BESTAETIGEN:
-                            empfangeBestaetigen();
-                            break;
-                        default:
-                            again = false;
-                            System.out.println("Unknown cmd" + cmd);
-                    }
-
+                        wuerfelEmpfangen();
+                        break;
+                    case Kommando.KOORDINATE:
+                        empfangeKoordinate();
+                        break;
+                    case Kommando.KAPITULATION:
+                        empfangeKapitulation();
+                        break;
+                    case Kommando.BESTAETIGEN:
+                        empfangeBestaetigen();
+                        break;
+                    default:
+                        again = false;
+                        System.out.println("Unknown cmd" + cmd);
                 }
-            } catch (StatusException e){
-                System.out.println("STATUSEXCEPTION;"+e.getLocalizedMessage());
-                again=false;
-            } catch (IOException e){
-                System.out.println("IOEXCEPTION;"+e.getLocalizedMessage());
-                again=false;
+
+
+            } catch (StatusException e) {
+                System.out.println("STATUSEXCEPTION;" + e.getLocalizedMessage());
+                again = false;
+            } catch (IOException e) {
+                System.out.println("IOEXCEPTION;" + e.getLocalizedMessage());
+                again = false;
             }
         }
     }
